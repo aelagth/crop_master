@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>작물마스터 퀴즈</title>
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>작물마스터 퀴즈</h1>
+            <p>사진 속 작물의 이름은 무엇일까요?</p>
+        </header>
+
+        <div id="start-area">
+            <div class="question-count-selector">
+                <h4>문제 개수 선택</h4>
+                <div class="options-group">
+                    <input type="radio" id="count10" name="question-count" value="10" checked>
+                    <label for="count10">10개</label>
+                    <input type="radio" id="count30" name="question-count" value="30">
+                    <label for="count30">30개</label>
+                    <input type="radio" id="count60" name="question-count" value="60">
+                    <label for="count60">60개</label>
+                    <input type="radio" id="count100" name="question-count" value="100">
+                    <label for="count100">100개</label>
+                    <input type="radio" id="count-all" name="question-count" value="all">
+                    <label for="count-all">전체</label>
+                </div>
+            </div>
+            <button id="start-btn" class="start-btn">게임 시작</button>
+        </div>
+
+        <main id="quiz-area" class="hidden">
+            <div class="score-board">
+                <span>점수: <span id="score">0</span></span>
+                <span id="timer" class="timer">시간: <span id="time-left">15</span>초</span>
+                <span><span id="question-number">0</span> / <span id="total-questions">0</span></span>
+            </div>
+
+            <div class="card">
+                <div class="image-container">
+                    <img id="quiz-image" src="" alt="작물 이미지">
+                </div>
+            </div>
+
+            <div id="options-container" class="options">
+                <!-- 선택지가 동적으로 추가될 영역 -->
+            </div>
+
+            <div id="feedback" class="feedback"></div>
+
+            <button id="next-btn" class="next-btn hidden">다음 문제</button>
+        </main>
+
+        <footer id="game-over-area" class="hidden">
+            <h2>게임 종료!</h2>
+            <p>최종 점수: <strong id="final-score">0</strong>점</p>
+            <button id="restart-btn">다시 시작</button>
+        </footer>
+    </div>
+
+    <script src="js/game-data.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

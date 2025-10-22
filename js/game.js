@@ -210,6 +210,27 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomLevel = Math.min(Math.max(1.2, zoomLevel), 5.0);
         quizImageEl.style.transform = `scale(${zoomLevel})`;
     });
+    imageContainer.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            quizImageEl.style.transform = `scale(${zoomLevel})`;
+        }
+    });
+
+    imageContainer.addEventListener('touchend', () => {
+        quizImageEl.style.transform = 'scale(1)';
+        quizImageEl.style.transformOrigin = 'center center';
+    });
+
+    imageContainer.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+            const rect = imageContainer.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+            const xPercent = (x / rect.width) * 100;
+            const yPercent = (y / rect.height) * 100;
+            quizImageEl.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+        }
+    });
 
     startBtn.addEventListener('click', startGame);
     nextBtn.addEventListener('click', showNextQuestion);
