@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showQuestion() {
+        startArea.classList.add('hidden'); // 게임 시작 시 startArea 숨김
+        gameOverArea.classList.add('hidden'); // 게임 시작 시 gameOverArea 숨김
+        quizArea.classList.remove('hidden'); // 퀴즈 화면 표시
+
         resetState();
         startTimer();
         const currentQuestion = questions[currentQuestionIndex];
@@ -236,6 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtn.addEventListener('click', showNextQuestion);
     restartBtn.addEventListener('click', () => {
         gameOverArea.classList.add('hidden');
+        quizArea.classList.add('hidden'); // 재시작 시 quizArea 숨김
         startArea.classList.remove('hidden');
         loadGameData();
     });

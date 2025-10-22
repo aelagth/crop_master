@@ -30,7 +30,7 @@ html, body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center; /* 활성화된 영역이 중앙에 오도록 */
 }
 
 main#quiz-area {
@@ -42,7 +42,18 @@ main#quiz-area {
 
 /* 시작 화면에서는 퀴즈 영역이 공간을 차지하지 않도록 수정 */
 main#quiz-area.hidden {
-    display: none;
+    display: none !important; /* hidden 클래스에 !important 추가 */
+    flex-grow: 0; /* 숨겨진 요소는 공간을 차지하지 않도록 */
+}
+
+#start-area.hidden {
+    display: none !important;
+    flex-grow: 0;
+}
+
+#game-over-area.hidden {
+    display: none !important;
+    flex-grow: 0;
 }
 
 .card {
@@ -246,10 +257,6 @@ header p {
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
-
-#game-over-area.hidden {
-    display: none;
 }
 
 #game-over-area h2 {
