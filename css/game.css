@@ -25,7 +25,7 @@ html, body {
     max-width: 500px;
     background-color: #ffffff;
     border-radius: 20px;
-    padding: 30px;
+    padding: 20px;
     text-align: center;
     box-sizing: border-box;
     display: flex;
@@ -34,16 +34,15 @@ html, body {
 }
 
 main#quiz-area {
-    flex-grow: 1; /* quiz-area가 사용 가능한 공간을 차지하도록 */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 자식 요소들을 세로로 고르게 분포 */
+    justify-content: flex-start; /* 위에서부터 쌓이도록 변경 */
 }
 
-/* 시작 화면에서는 퀴즈 영역이 공간을 차지하지 않도록 수정 */
 main#quiz-area.hidden {
-    display: none !important; /* hidden 클래스에 !important 추가 */
-    flex-grow: 0; /* 숨겨진 요소는 공간을 차지하지 않도록 */
+    display: none !important;
+    flex-grow: 0;
 }
 
 #start-area.hidden {
@@ -57,20 +56,19 @@ main#quiz-area.hidden {
 }
 
 .card {
-    /* flex-grow: 1 제거 */
     display: flex;
     flex-direction: column;
     margin-bottom: 15px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    max-height: 50vh; /* 이미지 영역이 너무 커지지 않도록 최대 높이 설정 */
+    flex-shrink: 1; /* 공간이 부족할 때 줄어들도록 설정 */
+    min-height: 150px; /* 최소 높이 지정 */
 }
 
 .image-container {
-    /* flex-grow: 1 제거 */
     width: 100%;
-    height: 100%; /* 부모(card)의 전체 높이를 차지 */
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -191,6 +189,7 @@ header p {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+    margin-bottom: 10px;
 }
 
 .option-btn {
@@ -225,11 +224,16 @@ header p {
     opacity: 0.7;
 }
 
+.feedback-container {
+    margin-top: auto; /* 남은 공간을 모두 차지하여 하단에 위치 */
+    padding-top: 10px;
+}
+
 .feedback {
-    margin-top: 10px;
     font-size: 1rem;
     font-weight: bold;
     height: 24px;
+    margin-bottom: 10px;
 }
 
 .next-btn, #restart-btn {
@@ -245,7 +249,6 @@ header p {
 
 .next-btn {
     background-color: #1a237e;
-    margin-top: 10px;
 }
 
 .next-btn:hover {
@@ -301,13 +304,14 @@ header p {
     }
 
     .card {
-        max-height: none; /* PC에서는 최대 높이 제한 해제 */
-        height: auto; /* PC에서는 높이 자동 조절 */
+        flex-shrink: 0;
+        min-height: 0;
+        height: auto;
         margin-bottom: 25px;
     }
 
     .image-container {
-        height: 400px; /* PC에서는 고정 높이 */
+        height: 400px;
     }
 
     header h1 {
@@ -326,6 +330,7 @@ header p {
     .options {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
+        margin-bottom: 0;
     }
 
     .option-btn {
@@ -333,9 +338,19 @@ header p {
         font-size: 1rem;
     }
 
+    .feedback-container {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
     .feedback {
         margin-top: 15px;
         font-size: 1.2rem;
         height: 30px;
+        margin-bottom: 0;
+    }
+
+    .next-btn {
+        margin-top: 10px;
     }
 }
