@@ -37,7 +37,7 @@ main#quiz-area {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* 위에서부터 쌓이도록 변경 */
+    justify-content: space-between; /* 위아래로 고르게 분포 */
 }
 
 main#quiz-area.hidden {
@@ -77,11 +77,12 @@ main#quiz-area.hidden {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     flex: 1; /* 남은 공간을 최대한 차지하고 필요하면 줄어들도록 */
+    max-height: 40vh; /* 이미지 영역 최대 높이 제한 */
 }
 
 .image-container {
     width: 100%;
-    height: 100%; /* 부모(card)의 전체 높이를 차지 */
+    height: auto; /* 이미지의 종횡비 유지 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -190,7 +191,7 @@ header p {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    /* margin-bottom: 10px; 제거 */
+    margin-bottom: 10px;
     position: relative; /* overlay를 위한 position 설정 */
 }
 
@@ -241,6 +242,11 @@ header p {
     z-index: 10; /* 다른 요소 위에 표시 */
     padding: 10px;
     box-sizing: border-box;
+    transition: background-color 0.3s ease; /* 투명도 전환 효과 */
+}
+
+.feedback-overlay.transparent {
+    background-color: rgba(255, 255, 255, 0.2); /* 투명하게 변경 */
 }
 
 .feedback {
@@ -250,7 +256,7 @@ header p {
     margin-bottom: 10px;
 }
 
-.next-btn, #restart-btn {
+.next-btn, #restart-btn, .show-answer-btn {
     width: 100%;
     padding: 15px;
     border: none;
@@ -259,6 +265,7 @@ header p {
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-top: 10px; /* 버튼 간 간격 */
 }
 
 .next-btn {
@@ -267,6 +274,14 @@ header p {
 
 .next-btn:hover {
     background-color: #3949ab;
+}
+
+.show-answer-btn {
+    background-color: #FF9800; /* 주황색 계열 */
+}
+
+.show-answer-btn:hover {
+    background-color: #FB8C00;
 }
 
 #game-over-area {
@@ -323,6 +338,7 @@ header p {
 
     .card {
         flex: 0 0 auto; /* PC에서는 고정된 크기 유지 */
+        max-height: none; /* PC에서는 최대 높이 제한 해제 */
         margin-bottom: 25px;
     }
 
@@ -367,7 +383,7 @@ header p {
         margin-bottom: 0;
     }
 
-    .next-btn {
+    .next-btn, .show-answer-btn {
         margin-top: 10px;
     }
 }

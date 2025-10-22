@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalScoreEl = document.getElementById('final-score');
     const restartBtn = document.getElementById('restart-btn');
     const feedbackOverlay = document.getElementById('feedback-overlay'); // 새로 추가된 오버레이 요소
+    const showAnswerBtn = document.getElementById('show-answer-btn'); // 새로 추가된 정답 확인 버튼
 
     let score = 0;
     let currentQuestionIndex = 0;
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.innerText = optionText;
             button.classList.add('option-btn');
             button.addEventListener('click', () => selectAnswer(button, correctAnswer));
-            optionsContainer.appendChild(button);
+            optionsContainer.insertBefore(button, feedbackOverlay); // feedbackOverlay 앞에 삽입
         });
     }
 
@@ -103,14 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function timeUp() {
-        const correctAnswer = questions[currentQuestionIndex].texts.text;
         Array.from(optionsContainer.children).forEach(button => {
-            button.classList.add('disabled');
-            // feedback-overlay가 활성화되면 option-btn은 숨겨지므로 correct 클래스 추가는 필요 없음
-            // if (button.innerText === correctAnswer) {
-            //     button.classList.add('correct');
-            // }
+            if (button.classList.contains('option-btn')) {
+                button.classList.add('disabled');
+            }
         });
+        const correctAnswer = questions[currentQuestionIndex].texts.text;
         feedbackEl.textContent = `시간 초과! 정답은 ${correctAnswer} 입니다.`;
         feedbackEl.style.color = '#F44336';
         feedbackOverlay.classList.remove('hidden'); // 오버레이 표시
@@ -142,11 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedAnswer = selectedBtn.innerText;
         
         Array.from(optionsContainer.children).forEach(button => {
-            button.classList.add('disabled');
-            // feedback-overlay가 활성화되면 option-btn은 숨겨지므로 correct 클래스 추가는 필요 없음
-            // if (button.innerText === correctAnswer) {
-            //     button.classList.add('correct');
-            // }
+            if (button.classList.contains('option-btn')) {
+                button.classList.add('disabled');
+            }
         });
 
         if (selectedAnswer === correctAnswer) {
@@ -155,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
             feedbackEl.textContent = '정답입니다!';
             feedbackEl.style.color = '#4CAF50';
         } else {
-            // selectedBtn.classList.add('wrong'); // 오버레이가 덮으므로 필요 없음
             feedbackEl.textContent = `오답! 정답은 ${correctAnswer} 입니다.`;
             feedbackEl.style.color = '#F44336';
         }
@@ -166,18 +162,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetState() {
         clearInterval(timerInterval);
         feedbackEl.textContent = '';
-        // nextBtn.classList.add('hidden'); // 이제 nextBtn은 overlay 내부에 있으므로 직접 제어하지 않음
         feedbackOverlay.classList.add('hidden'); // 오버레이 숨김
+        feedbackOverlay.classList.remove('transparent'); // 투명도 초기화
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
-        while (optionsContainer.firstChild) {
-            // feedback-overlay는 남겨두고 option-btn만 제거
-            if (optionsContainer.firstChild.id !== 'feedback-overlay') {
-                optionsContainer.removeChild(optionsContainer.firstChild);
-            } else {
-                break; // overlay를 만나면 중단
+        // feedbackOverlay를 제외한 모든 option-btn 제거
+        Array.from(optionsContainer.children).forEach(child => {
+            if (child.classList.contains('option-btn')) {
+                optionsContainer.removeChild(child);
             }
-        }
+        });
     }
 
     function showNextQuestion() {
@@ -243,6 +237,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const yPercent = (y / rect.height) * 100;
             quizImageEl.style.transformOrigin = `${xPercent}% ${yPercent}%`;
         }
+    });
+
+    showAnswerBtn.addEventListener('touchstart', () => {
+        feedbackOverlay.classList.add('transparent');
+        // 정답 버튼에 correct 클래스 추가 (선택지 위에 표시)
+        const correctAnswer = questions[currentQuestionIndex].texts.text;
+        Array.from(optionsContainer.children).forEach(button => {
+            if (button.classList.contains('option-btn') && button.innerText === correctAnswer) {
+                button.classList.add('correct');
+            }
+        });
+    });
+
+    showAnswerBtn.addEventListener('touchend', () => {
+        feedbackOverlay.classList.remove('transparent');
+        // 정답 버튼에 correct 클래스 제거
+        Array.from(optionsContainer.children).forEach(button => {
+            if (button.classList.contains('option-btn') && button.classList.contains('correct')) {
+                button.classList.remove('correct');
+            }
+        });
     });
 
     startBtn.addEventListener('click', startGame);
