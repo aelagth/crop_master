@@ -11,18 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizImageEl = document.getElementById('quiz-image');
     const optionsContainer = document.getElementById('options-container');
     const feedbackEl = document.getElementById('feedback');
-    const nextBtn = document.getElementById('next-btn'); // nextBtn은 feedback-overlay 내부에 있음
+    const nextBtn = document.getElementById('next-btn');
     const gameOverArea = document.getElementById('game-over-area');
     const finalScoreEl = document.getElementById('final-score');
     const restartBtn = document.getElementById('restart-btn');
-    const feedbackOverlay = document.getElementById('feedback-overlay'); // 새로 추가된 오버레이 요소
-    const showAnswerBtn = document.getElementById('show-answer-btn'); // 새로 추가된 정답 확인 버튼
+    const feedbackOverlay = document.getElementById('feedback-overlay');
 
     let score = 0;
     let currentQuestionIndex = 0;
     let allQuestions = [];
     let questions = [];
-    let zoomLevel = 1.5;
+    let zoomLevel = 1.95; // 1.5 * 1.3 = 1.95
     let timerInterval;
     let timeLeft = 15;
 
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         score = 0;
         currentQuestionIndex = 0;
-        questions = shuffleArray([...allQuestions]); // 원본 배열 복사 후 섞기
+        questions = shuffleArray([...allQuestions]);
 
         if (selectedCount !== 'all') {
             questions = questions.slice(0, parseInt(selectedCount, 10));
@@ -64,9 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showQuestion() {
-        startArea.classList.add('hidden'); // 게임 시작 시 startArea 숨김
-        gameOverArea.classList.add('hidden'); // 게임 시작 시 gameOverArea 숨김
-        quizArea.classList.remove('hidden'); // 퀴즈 화면 표시
+        startArea.classList.add('hidden');
+        gameOverArea.classList.add('hidden');
+        quizArea.classList.remove('hidden');
 
         resetState();
         startTimer();
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.innerText = optionText;
             button.classList.add('option-btn');
             button.addEventListener('click', () => selectAnswer(button, correctAnswer));
-            optionsContainer.insertBefore(button, feedbackOverlay); // feedbackOverlay 앞에 삽입
+            optionsContainer.insertBefore(button, feedbackOverlay);
         });
     }
 
@@ -112,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const correctAnswer = questions[currentQuestionIndex].texts.text;
         feedbackEl.textContent = `시간 초과! 정답은 ${correctAnswer} 입니다.`;
         feedbackEl.style.color = '#F44336';
-        feedbackOverlay.classList.remove('hidden'); // 오버레이 표시
+        feedbackOverlay.classList.remove('hidden');
     }
 
     function generateOptions(correctAnswer) {
@@ -126,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 options.push(shuffledWrongAnswers[i]);
             }
         }
-        // 만약 보기 개수가 4개 미만이면, 전체 답변에서 중복되지 않게 추가
         while(options.length < 4 && options.length < allAnswers.length) {
             const randomAnswer = allAnswers[Math.floor(Math.random() * allAnswers.length)];
             if(!options.includes(randomAnswer)) {
@@ -156,17 +154,15 @@ document.addEventListener('DOMContentLoaded', () => {
             feedbackEl.style.color = '#F44336';
         }
 
-        feedbackOverlay.classList.remove('hidden'); // 오버레이 표시
+        feedbackOverlay.classList.remove('hidden');
     }
 
     function resetState() {
         clearInterval(timerInterval);
         feedbackEl.textContent = '';
-        feedbackOverlay.classList.add('hidden'); // 오버레이 숨김
-        feedbackOverlay.classList.remove('transparent'); // 투명도 초기화
+        feedbackOverlay.classList.add('hidden');
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
-        // feedbackOverlay를 제외한 모든 option-btn 제거
         Array.from(optionsContainer.children).forEach(child => {
             if (child.classList.contains('option-btn')) {
                 optionsContainer.removeChild(child);
@@ -239,32 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    showAnswerBtn.addEventListener('touchstart', () => {
-        feedbackOverlay.classList.add('transparent');
-        // 정답 버튼에 correct 클래스 추가 (선택지 위에 표시)
-        const correctAnswer = questions[currentQuestionIndex].texts.text;
-        Array.from(optionsContainer.children).forEach(button => {
-            if (button.classList.contains('option-btn') && button.innerText === correctAnswer) {
-                button.classList.add('correct');
-            }
-        });
-    });
-
-    showAnswerBtn.addEventListener('touchend', () => {
-        feedbackOverlay.classList.remove('transparent');
-        // 정답 버튼에 correct 클래스 제거
-        Array.from(optionsContainer.children).forEach(button => {
-            if (button.classList.contains('option-btn') && button.classList.contains('correct')) {
-                button.classList.remove('correct');
-            }
-        });
-    });
-
     startBtn.addEventListener('click', startGame);
     nextBtn.addEventListener('click', showNextQuestion);
     restartBtn.addEventListener('click', () => {
         gameOverArea.classList.add('hidden');
-        quizArea.classList.add('hidden'); // 재시작 시 quizArea 숨김
+        quizArea.classList.add('hidden');
         startArea.classList.remove('hidden');
         loadGameData();
     });

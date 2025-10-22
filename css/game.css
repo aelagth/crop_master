@@ -243,15 +243,6 @@ header p {
     z-index: 10; /* 다른 요소 위에 표시 */
     padding: 10px;
     box-sizing: border-box;
-    transition: background-color 0.3s ease; /* 투명도 전환 효과 */
-}
-
-.feedback-overlay.transparent {
-    background-color: rgba(255, 255, 255, 0.2); /* 투명하게 변경 */
-}
-
-.feedback-overlay.transparent .button-wrapper {
-    opacity: 0 !important; /* 버튼 래퍼를 투명하게 */
 }
 
 .feedback {
@@ -261,26 +252,16 @@ header p {
     margin-bottom: 10px;
 }
 
-.feedback-overlay .button-wrapper {
-    display: flex;
-    justify-content: space-between;
+.next-btn, #restart-btn {
     width: 100%;
-    transition: opacity 0.3s ease;
-}
-
-.next-btn, #restart-btn, .show-answer-btn {
     padding: 12px; /* 세로 길이 축소 */
     border: none;
     border-radius: 10px;
     color: white;
     font-size: 1.1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s;
     margin-top: 10px; /* 버튼 간 간격 */
-}
-
-.next-btn, .show-answer-btn {
-    width: calc(50% - 5px); /* 가로 반절 크기 */
 }
 
 .next-btn {
@@ -289,18 +270,6 @@ header p {
 
 .next-btn:hover {
     background-color: #3949ab;
-}
-
-.show-answer-btn {
-    background-color: #FF9800; /* 주황색 계열 */
-    user-select: none; /* 텍스트 선택 방지 */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-.show-answer-btn:hover {
-    background-color: #FB8C00;
 }
 
 #game-over-area {
@@ -319,7 +288,6 @@ header p {
 }
 
 #restart-btn {
-    width: 100%;
     background-color: #4CAF50;
     margin-top: 20px;
 }
@@ -396,11 +364,6 @@ header p {
         padding: 0;
     }
 
-    .feedback-overlay .button-wrapper {
-        display: block;
-        opacity: 1 !important; /* PC에서는 항상 보이도록 */
-    }
-
     .feedback {
         margin-top: 15px;
         font-size: 1.2rem;
@@ -408,7 +371,7 @@ header p {
         margin-bottom: 0;
     }
 
-    .next-btn, .show-answer-btn {
+    .next-btn {
         width: 100%;
         margin-top: 10px;
         padding: 15px; /* PC에서는 원래 크기 유지 */
