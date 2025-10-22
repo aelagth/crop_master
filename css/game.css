@@ -184,6 +184,7 @@ header p {
     height: 100%;
     object-fit: contain;
     transition: transform 0.3s ease;
+    pointer-events: none; /* 이미지 길게 누르기 방지 */
 }
 
 .options {
@@ -249,6 +250,10 @@ header p {
     background-color: rgba(255, 255, 255, 0.2); /* 투명하게 변경 */
 }
 
+.feedback-overlay.transparent .show-answer-btn {
+    opacity: 0; /* 버튼도 투명하게 */
+}
+
 .feedback {
     font-size: 1rem;
     font-weight: bold;
@@ -256,16 +261,25 @@ header p {
     margin-bottom: 10px;
 }
 
-.next-btn, #restart-btn, .show-answer-btn {
+.feedback-overlay .button-wrapper {
+    display: flex;
+    justify-content: space-between;
     width: 100%;
+}
+
+.next-btn, #restart-btn, .show-answer-btn {
     padding: 15px;
     border: none;
     border-radius: 10px;
     color: white;
     font-size: 1.1rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
     margin-top: 10px; /* 버튼 간 간격 */
+}
+
+.next-btn, .show-answer-btn {
+    width: calc(50% - 5px); /* 가로 반절 크기 */
 }
 
 .next-btn {
@@ -278,6 +292,10 @@ header p {
 
 .show-answer-btn {
     background-color: #FF9800; /* 주황색 계열 */
+    user-select: none; /* 텍스트 선택 방지 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .show-answer-btn:hover {
@@ -300,6 +318,7 @@ header p {
 }
 
 #restart-btn {
+    width: 100%;
     background-color: #4CAF50;
     margin-top: 20px;
 }
@@ -376,6 +395,10 @@ header p {
         padding: 0;
     }
 
+    .feedback-overlay .button-wrapper {
+        display: block;
+    }
+
     .feedback {
         margin-top: 15px;
         font-size: 1.2rem;
@@ -384,6 +407,7 @@ header p {
     }
 
     .next-btn, .show-answer-btn {
+        width: 100%;
         margin-top: 10px;
     }
 }
