@@ -37,7 +37,7 @@ main#quiz-area {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* 위에서부터 쌓이도록 변경 */
+    justify-content: space-between; /* 자식 요소들을 세로로 고르게 분포 */
 }
 
 main#quiz-area.hidden {
@@ -55,6 +55,20 @@ main#quiz-area.hidden {
     flex-grow: 0;
 }
 
+.score-board {
+    flex-shrink: 0; /* 줄어들지 않도록 설정 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #3949ab;
+    font-size: 0.9rem;
+}
+
 .card {
     display: flex;
     flex-direction: column;
@@ -62,13 +76,13 @@ main#quiz-area.hidden {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    flex-shrink: 1; /* 공간이 부족할 때 줄어들도록 설정 */
-    min-height: 150px; /* 최소 높이 지정 */
+    flex: 1; /* 남은 공간을 최대한 차지하고 필요하면 줄어들도록 */
+    /* min-height 제거 */
 }
 
 .image-container {
     width: 100%;
-    height: 100%;
+    height: 100%; /* 부모(card)의 전체 높이를 차지 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -148,19 +162,6 @@ header p {
     box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
 }
 
-.score-board {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f8f9fa;
-    padding: 10px 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    font-weight: bold;
-    color: #3949ab;
-    font-size: 0.9rem;
-}
-
 .timer {
     font-size: 1rem;
     color: #1a237e;
@@ -186,6 +187,7 @@ header p {
 }
 
 .options {
+    flex-shrink: 0; /* 줄어들지 않도록 설정 */
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
@@ -225,6 +227,7 @@ header p {
 }
 
 .feedback-container {
+    flex-shrink: 0; /* 줄어들지 않도록 설정 */
     margin-top: auto; /* 남은 공간을 모두 차지하여 하단에 위치 */
     padding-top: 10px;
 }
@@ -303,10 +306,12 @@ header p {
         flex-grow: 0;
     }
 
+    .score-board {
+        margin-bottom: 20px;
+    }
+
     .card {
-        flex-shrink: 0;
-        min-height: 0;
-        height: auto;
+        flex: 0 0 auto; /* PC에서는 고정된 크기 유지 */
         margin-bottom: 25px;
     }
 
