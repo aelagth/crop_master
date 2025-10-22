@@ -41,7 +41,7 @@ main#quiz-area {
 }
 
 /* 시작 화면에서는 퀴즈 영역이 공간을 차지하지 않도록 수정 */
-main#quiz-area.hidden > * {
+main#quiz-area.hidden {
     display: none;
 }
 
@@ -246,6 +246,10 @@ header p {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+#game-over-area.hidden {
+    display: none;
 }
 
 #game-over-area h2 {
