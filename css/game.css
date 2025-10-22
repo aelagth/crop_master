@@ -9,7 +9,7 @@ body {
     min-height: 100vh;
     margin: 0;
     color: #333;
-    padding: 0; /* padding 제거 */
+    padding: 10px 0; /* 상하 여백 추가 */
     box-sizing: border-box;
     touch-action: manipulation; /* 더블 탭 확대 방지 */
 }
@@ -21,8 +21,10 @@ html, body {
 
 .game-container {
     width: 100%;
-    height: 100%;
+    height: 100%; /* 전체 높이 사용 */
+    max-width: 500px;
     background-color: #ffffff;
+    border-radius: 20px;
     padding: 20px;
     text-align: center;
     box-sizing: border-box;
@@ -32,25 +34,32 @@ html, body {
 }
 
 main#quiz-area {
-    flex-grow: 1;
+    flex-grow: 1; /* quiz-area가 사용 가능한 공간을 차지하도록 */
     display: flex;
     flex-direction: column;
+    justify-content: space-between; /* 자식 요소들을 세로로 고르게 분포 */
+}
+
+/* 시작 화면에서는 퀴즈 영역이 공간을 차지하지 않도록 수정 */
+main#quiz-area.hidden > * {
+    display: none;
 }
 
 .card {
-    flex-grow: 1;
+    /* flex-grow: 1 제거 */
     display: flex;
     flex-direction: column;
     margin-bottom: 15px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    max-height: 50vh; /* 이미지 영역이 너무 커지지 않도록 최대 높이 설정 */
 }
 
 .image-container {
-    flex-grow: 1;
+    /* flex-grow: 1 제거 */
     width: 100%;
-    height: 100%;
+    height: 100%; /* 부모(card)의 전체 높이를 차지 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -72,6 +81,10 @@ header p {
 
 #start-area {
     padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
 }
 
 .question-count-selector {
@@ -228,6 +241,13 @@ header p {
     background-color: #3949ab;
 }
 
+#game-over-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 #game-over-area h2 {
     color: #1a237e;
 }
@@ -265,13 +285,18 @@ header p {
         flex-grow: 0;
     }
 
-    .card {
+    #start-area {
         flex-grow: 0;
+    }
+
+    .card {
+        max-height: none; /* PC에서는 최대 높이 제한 해제 */
+        height: auto; /* PC에서는 높이 자동 조절 */
         margin-bottom: 25px;
     }
 
     .image-container {
-        height: 400px;
+        height: 400px; /* PC에서는 고정 높이 */
     }
 
     header h1 {
