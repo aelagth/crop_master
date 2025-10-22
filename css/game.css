@@ -40,21 +40,6 @@ main#quiz-area {
     justify-content: space-between; /* 위아래로 고르게 분포 */
 }
 
-main#quiz-area.hidden {
-    display: none !important;
-    flex-grow: 0;
-}
-
-#start-area.hidden {
-    display: none !important;
-    flex-grow: 0;
-}
-
-#game-over-area.hidden {
-    display: none !important;
-    flex-grow: 0;
-}
-
 .score-board {
     flex-shrink: 0; /* 줄어들지 않도록 설정 */
     display: flex;
@@ -108,6 +93,8 @@ header p {
     flex-direction: column;
     justify-content: center;
     flex-grow: 1;
+    position: relative; /* z-index 적용을 위해 */
+    z-index: 20; /* 다른 요소들보다 위에 있도록 */
 }
 
 .question-count-selector {
@@ -293,7 +280,8 @@ header p {
 }
 
 .hidden {
-    display: none;
+    display: none !important; /* 확실하게 숨기기 */
+    pointer-events: none; /* 숨겨진 요소가 이벤트 가로채지 않도록 */
 }
 
 /* PC 환경 스타일 */
@@ -362,6 +350,7 @@ header p {
         position: static; /* PC에서는 overlay 비활성화 */
         background-color: transparent;
         padding: 0;
+        text-align: center; /* 가운데 정렬 추가 */
     }
 
     .feedback {
