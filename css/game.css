@@ -250,8 +250,8 @@ header p {
     background-color: rgba(255, 255, 255, 0.2); /* 투명하게 변경 */
 }
 
-.feedback-overlay.transparent .show-answer-btn {
-    opacity: 0; /* 버튼도 투명하게 */
+.feedback-overlay.transparent .button-wrapper {
+    opacity: 0 !important; /* 버튼 래퍼를 투명하게 */
 }
 
 .feedback {
@@ -265,10 +265,11 @@ header p {
     display: flex;
     justify-content: space-between;
     width: 100%;
+    transition: opacity 0.3s ease;
 }
 
 .next-btn, #restart-btn, .show-answer-btn {
-    padding: 15px;
+    padding: 12px; /* 세로 길이 축소 */
     border: none;
     border-radius: 10px;
     color: white;
@@ -397,6 +398,7 @@ header p {
 
     .feedback-overlay .button-wrapper {
         display: block;
+        opacity: 1 !important; /* PC에서는 항상 보이도록 */
     }
 
     .feedback {
@@ -409,5 +411,6 @@ header p {
     .next-btn, .show-answer-btn {
         width: 100%;
         margin-top: 10px;
+        padding: 15px; /* PC에서는 원래 크기 유지 */
     }
 }
