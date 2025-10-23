@@ -73,19 +73,6 @@ main#quiz-area {
     align-items: center;
     background-color: #f0f2f5;
     overflow: hidden;
-    position: relative; /* 오버레이를 위한 position 설정 */
-}
-
-.image-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50%; /* 초기 높이 */
-    background-color: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: height 1s linear; /* 높이 변경 애니메이션 */
 }
 
 
