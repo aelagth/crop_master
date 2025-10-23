@@ -92,12 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
         timerEl.classList.remove('warning');
         
         // 오버레이 초기화 및 애니메이션 시작
-        imageOverlay.style.transition = 'height 25s linear';
-        imageOverlay.style.height = '50%';
+        imageOverlay.style.transition = 'none'; // 먼저 transition을 비활성화
+        imageOverlay.style.height = '50%'; // 높이를 즉시 50%로 설정
+        
         // 강제 리플로우 후 애니메이션 시작
         setTimeout(() => {
+            imageOverlay.style.transition = 'height 25s linear';
             imageOverlay.style.height = '0%';
-        }, 100);
+        }, 10); // 딜레이를 짧게 줄여도 무방
 
         timerInterval = setInterval(() => {
             timeLeft--;
@@ -146,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectAnswer(selectedBtn, correctAnswer) {
         clearInterval(timerInterval);
-        imageOverlay.style.height = imageOverlay.offsetHeight + 'px'; // 애니메이션 정지
+        // 현재 진행중인 애니메이션의 최종 상태를 즉시 적용
+        const computedHeight = window.getComputedStyle(imageOverlay).height;
+        imageOverlay.style.height = computedHeight;
 
         const selectedAnswer = selectedBtn.innerText;
         
@@ -183,8 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackOverlay.classList.add('hidden');
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
-        imageOverlay.style.transition = 'none'; // 애니메이션 초기화
-        imageOverlay.style.height = '50%';
         
         optionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.remove());
     }
