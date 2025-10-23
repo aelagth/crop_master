@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeLeftEl = document.getElementById('time-left');
     const imageContainer = document.querySelector('.image-container');
     const quizImageEl = document.getElementById('quiz-image');
-    const imageOverlay = document.getElementById('image-overlay');
     const optionsContainer = document.getElementById('options-container');
     const feedbackEl = document.getElementById('feedback');
     const nextBtn = document.getElementById('next-btn');
@@ -22,9 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuestionIndex = 0;
     let allQuestions = [];
     let questions = [];
-    let zoomLevel = 1.95;
+    let zoomLevel = 1.95; // 1.5 * 1.3 = 1.95
     let timerInterval;
-    let timeLeft = 25;
+    let timeLeft = 15;
 
     function loadGameData() {
         if (typeof gameData !== 'undefined' && gameData.length > 0) {
@@ -87,13 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startTimer() {
-        timeLeft = 25;
+        timeLeft = 15;
         timeLeftEl.textContent = timeLeft;
         timerEl.classList.remove('warning');
-        
-        imageOverlay.classList.remove('reset');
-        imageOverlay.classList.add('animate');
-
         timerInterval = setInterval(() => {
             timeLeft--;
             timeLeftEl.textContent = timeLeft;
@@ -141,10 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectAnswer(selectedBtn, correctAnswer) {
         clearInterval(timerInterval);
-        const computedHeight = window.getComputedStyle(imageOverlay).height;
-        imageOverlay.classList.remove('animate');
-        imageOverlay.style.height = computedHeight;
-
         const selectedAnswer = selectedBtn.innerText;
         
         Array.from(optionsContainer.children).forEach(button => {
@@ -154,17 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (selectedAnswer === correctAnswer) {
-            let points = 0;
-            if (timeLeft >= 17) {
-                points = 3;
-            } else if (timeLeft >= 8) {
-                points = 2;
-            } else {
-                points = 1;
-            }
-            score += points;
+            score++;
             scoreEl.textContent = score;
-            feedbackEl.textContent = `정답입니다! (+${points}점)`;
+            feedbackEl.textContent = '정답입니다!';
             feedbackEl.style.color = '#4CAF50';
         } else {
             feedbackEl.textContent = `오답! 정답은 ${correctAnswer} 입니다.`;
@@ -181,9 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
         
-        imageOverlay.classList.remove('animate');
-        imageOverlay.classList.add('reset');
-        
+        // 더 효율적인 방식으로 option-btn 제거
         optionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.remove());
     }
 
