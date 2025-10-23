@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeLeftEl = document.getElementById('time-left');
     const imageContainer = document.querySelector('.image-container');
     const quizImageEl = document.getElementById('quiz-image');
+    const imageOverlay = document.getElementById('image-overlay');
     const optionsContainer = document.getElementById('options-container');
     const feedbackEl = document.getElementById('feedback');
     const nextBtn = document.getElementById('next-btn');
@@ -21,9 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuestionIndex = 0;
     let allQuestions = [];
     let questions = [];
-    let zoomLevel = 1.95; // 1.5 * 1.3 = 1.95
+    let zoomLevel = 1.95;
     let timerInterval;
-    let timeLeft = 15;
+    let timeLeft = 25; // 타이머 25초로 변경
 
     function loadGameData() {
         if (typeof gameData !== 'undefined' && gameData.length > 0) {
@@ -86,9 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startTimer() {
-        timeLeft = 15;
+        timeLeft = 25;
         timeLeftEl.textContent = timeLeft;
         timerEl.classList.remove('warning');
+        
+        // 오버레이 초기화 및 애니메이션 시작
+        imageOverlay.style.transition = 'height 25s linear';
+        imageOverlay.style.height = '50%';
+        // 강제 리플로우 후 애니메이션 시작
+        setTimeout(() => {
+            imageOverlay.style.height = '0%';
+        }, 100);
+
         timerInterval = setInterval(() => {
             timeLeft--;
             timeLeftEl.textContent = timeLeft;
@@ -136,6 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectAnswer(selectedBtn, correctAnswer) {
         clearInterval(timerInterval);
+        imageOverlay.style.height = imageOverlay.offsetHeight + 'px'; // 애니메이션 정지
+
         const selectedAnswer = selectedBtn.innerText;
         
         Array.from(optionsContainer.children).forEach(button => {
@@ -145,9 +157,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (selectedAnswer === correctAnswer) {
-            score++;
+            let points = 0;
+            if (timeLeft >= 17) {
+                points = 3;
+            } else if (timeLeft >= 8) {
+                points = 2;
+            } else {
+                points = 1;
+            }
+            score += points;
             scoreEl.textContent = score;
-            feedbackEl.textContent = '정답입니다!';
+            feedbackEl.textContent = `정답입니다! (+${points}점)`;
             feedbackEl.style.color = '#4CAF50';
         } else {
             feedbackEl.textContent = `오답! 정답은 ${correctAnswer} 입니다.`;
@@ -163,11 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackOverlay.classList.add('hidden');
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
-        Array.from(optionsContainer.children).forEach(child => {
-            if (child.classList.contains('option-btn')) {
-                optionsContainer.removeChild(child);
-            }
-        });
+        imageOverlay.style.transition = 'none'; // 애니메이션 초기화
+        imageOverlay.style.height = '50%';
+        
+        optionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.remove());
     }
 
     function showNextQuestion() {

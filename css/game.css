@@ -73,6 +73,19 @@ main#quiz-area {
     align-items: center;
     background-color: #f0f2f5;
     overflow: hidden;
+    position: relative; /* 오버레이를 위한 position 설정 */
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%; /* 초기 높이 */
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: height 1s linear; /* 높이 변경 애니메이션 */
 }
 
 
@@ -315,7 +328,6 @@ header p {
 
     .score-board {
         font-size: 1rem;
-        margin-bottom: 20px;
     }
 
     .timer {
@@ -323,7 +335,6 @@ header p {
     }
     
     .options {
-        grid-template-columns: 1fr 1fr;
         gap: 15px;
         margin-bottom: 0;
     }
@@ -333,8 +344,6 @@ header p {
         font-size: 1rem;
     }
 
-    /* .feedback-overlay 관련 재정의 제거 */
-
     .feedback {
         margin-top: 15px;
         font-size: 1.2rem;
@@ -343,8 +352,6 @@ header p {
     }
 
     .next-btn {
-        width: 100%;
-        margin-top: 10px;
         padding: 15px; /* PC에서는 원래 크기 유지 */
     }
 }
