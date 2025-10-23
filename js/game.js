@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeLeftEl = document.getElementById('time-left');
     const imageContainer = document.querySelector('.image-container');
     const quizImageEl = document.getElementById('quiz-image');
-    const blurImage = document.getElementById('blur-image'); // 블러 이미지 요소
+    const imageOverlay = document.getElementById('image-overlay');
     const optionsContainer = document.getElementById('options-container');
     const feedbackEl = document.getElementById('feedback');
     const nextBtn = document.getElementById('next-btn');
@@ -73,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentQuestion = questions[currentQuestionIndex];
         questionNumberEl.textContent = currentQuestionIndex + 1;
         quizImageEl.src = currentQuestion.image_path;
-        blurImage.src = currentQuestion.image_path; // 블러 이미지 소스도 설정
 
         const correctAnswer = currentQuestion.texts.text;
         const options = generateOptions(correctAnswer);
@@ -92,10 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
         timeLeftEl.textContent = timeLeft;
         timerEl.classList.remove('warning');
         
-        // 블러 이미지 애니메이션 시작
-        setTimeout(() => {
-            blurImage.style.clipPath = 'inset(100% 0 0 0)';
-        }, 10);
+        imageOverlay.classList.remove('reset');
+        imageOverlay.classList.add('animate');
 
         timerInterval = setInterval(() => {
             timeLeft--;
@@ -144,10 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectAnswer(selectedBtn, correctAnswer) {
         clearInterval(timerInterval);
-        // 현재 진행중인 애니메이션의 최종 상태를 즉시 적용
-        const computedClipPath = window.getComputedStyle(blurImage).clipPath;
-        blurImage.style.transition = 'none';
-        blurImage.style.clipPath = computedClipPath;
+        const computedHeight = window.getComputedStyle(imageOverlay).height;
+        imageOverlay.classList.remove('animate');
+        imageOverlay.style.height = computedHeight;
 
         const selectedAnswer = selectedBtn.innerText;
         
@@ -185,9 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
         
-        // 블러 이미지 초기화
-        blurImage.style.transition = 'none';
-        blurImage.style.clipPath = 'inset(50% 0 0 0)';
+        imageOverlay.classList.remove('animate');
+        imageOverlay.classList.add('reset');
         
         optionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.remove());
     }

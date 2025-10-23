@@ -9,9 +9,9 @@ body {
     min-height: 100vh;
     margin: 0;
     color: #333;
-    padding: 10px 0; /* 상하 여백 추가 */
+    padding: 10px; /* 모든 화면에서 동일한 여백 */
     box-sizing: border-box;
-    touch-action: manipulation; /* 더블 탭 확대 방지 */
+    touch-action: manipulation;
 }
 
 html, body {
@@ -21,8 +21,8 @@ html, body {
 
 .game-container {
     width: 100%;
-    height: 100%; /* 전체 높이 사용 */
-    max-width: 500px;
+    height: 100%;
+    max-width: 500px; /* 모든 화면에서 최대 너비 제한 */
     background-color: #ffffff;
     border-radius: 20px;
     padding: 20px;
@@ -30,18 +30,18 @@ html, body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 활성화된 영역이 중앙에 오도록 */
+    justify-content: center;
 }
 
 main#quiz-area {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 위아래로 고르게 분포 */
+    justify-content: space-between;
 }
 
 .score-board {
-    flex-shrink: 0; /* 줄어들지 않도록 설정 */
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -51,7 +51,7 @@ main#quiz-area {
     margin-bottom: 15px;
     font-weight: bold;
     color: #3949ab;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .card {
@@ -61,43 +61,45 @@ main#quiz-area {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    flex: 1; /* 남은 공간을 최대한 차지하고 필요하면 줄어들도록 */
-    max-height: 40vh; /* 이미지 영역 최대 높이 제한 */
+    flex: 1;
+    min-height: 200px; /* 이미지 영역 최소 높이 보장 */
 }
 
 .image-container {
     width: 100%;
-    height: auto; /* 이미지의 종횡비 유지 */
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #f0f2f5;
     overflow: hidden;
-    position: relative; /* 오버레이를 위한 position 설정 */
+    position: relative;
 }
 
-.quiz-image {
+.image-overlay {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-    pointer-events: none; /* 이미지 길게 누르기 방지 */
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-.blur-image {
-    filter: blur(20px);
-    clip-path: inset(50% 0 0 0); /* 초기 상태: 아래쪽 절반만 보임 */
-    transition: clip-path 25s linear;
+.image-overlay.reset {
+    transition: none;
+    height: 50%;
 }
 
+.image-overlay.animate {
+    transition: height 25s linear;
+    height: 0%;
+}
 
 header h1 {
     color: #1a237e;
     margin-bottom: 5px;
-    font-size: 1.8rem;
+    font-size: 2rem;
 }
 
 header p {
@@ -106,13 +108,12 @@ header p {
 }
 
 #start-area {
-    padding: 30px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     flex-grow: 1;
-    position: relative; /* z-index 적용을 위해 */
-    z-index: 20; /* 다른 요소들보다 위에 있도록 */
+    position: relative;
+    z-index: 20;
 }
 
 .question-count-selector {
@@ -168,7 +169,7 @@ header p {
 }
 
 .timer {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #1a237e;
     transition: color 0.5s ease;
 }
@@ -184,22 +185,29 @@ header p {
     100% { transform: scale(1); }
 }
 
+#quiz-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
 .options {
-    flex-shrink: 0; /* 줄어들지 않도록 설정 */
+    flex-shrink: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
-    position: relative; /* overlay를 위한 position 설정 */
+    gap: 15px;
+    position: relative;
 }
 
 .option-btn {
-    padding: 12px;
+    padding: 15px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     background-color: #fff;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1rem;
     transition: all 0.3s ease;
 }
 
@@ -231,34 +239,32 @@ header p {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.95); /* 흰색 배경에 투명도 */
+    background-color: rgba(255, 255, 255, 0.95);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     border-radius: 10px;
-    z-index: 10; /* 다른 요소 위에 표시 */
+    z-index: 10;
     padding: 10px;
     box-sizing: border-box;
 }
 
 .feedback {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: bold;
-    height: 24px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .next-btn, #restart-btn {
     width: 100%;
-    padding: 12px; /* 세로 길이 축소 */
+    padding: 15px;
     border: none;
     border-radius: 10px;
     color: white;
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-top: 10px; /* 버튼 간 간격 */
 }
 
 .next-btn {
@@ -290,65 +296,6 @@ header p {
 }
 
 .hidden {
-    display: none !important; /* 확실하게 숨기기 */
-    pointer-events: none; /* 숨겨진 요소가 이벤트 가로채지 않도록 */
-}
-
-/* PC 환경 스타일 */
-@media (min-width: 600px) {
-    .game-container {
-        height: auto;
-        justify-content: flex-start;
-    }
-
-    main#quiz-area {
-        flex-grow: 0;
-    }
-
-    #start-area {
-        flex-grow: 0;
-    }
-
-    .card {
-        flex: 0 0 auto; /* PC에서는 고정된 크기 유지 */
-        max-height: none; /* PC에서는 최대 높이 제한 해제 */
-        margin-bottom: 25px;
-    }
-
-    .image-container {
-        height: 400px;
-    }
-
-    header h1 {
-        font-size: 2.2rem;
-    }
-
-    .score-board {
-        font-size: 1rem;
-    }
-
-    .timer {
-        font-size: 1.1rem;
-    }
-    
-    .options {
-        gap: 15px;
-        margin-bottom: 0;
-    }
-
-    .option-btn {
-        padding: 15px;
-        font-size: 1rem;
-    }
-
-    .feedback {
-        margin-top: 15px;
-        font-size: 1.2rem;
-        height: 30px;
-        margin-bottom: 0;
-    }
-
-    .next-btn {
-        padding: 15px; /* PC에서는 원래 크기 유지 */
-    }
+    display: none !important;
+    pointer-events: none;
 }
