@@ -286,17 +286,8 @@ header p {
 
 /* PC 환경 스타일 */
 @media (min-width: 600px) {
-    body {
-        padding: 10px;
-    }
-
     .game-container {
-        width: 100%;
-        max-width: 500px;
         height: auto;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        padding: 30px;
         justify-content: flex-start;
     }
 
@@ -306,10 +297,6 @@ header p {
 
     #start-area {
         flex-grow: 0;
-    }
-
-    .score-board {
-        margin-bottom: 20px;
     }
 
     .card {
@@ -344,13 +331,6 @@ header p {
     .option-btn {
         padding: 15px;
         font-size: 1rem;
-    }
-
-    .feedback-overlay {
-        position: static; /* PC에서는 overlay 비활성화 */
-        background-color: transparent;
-        padding: 0;
-        text-align: center; /* 가운데 정렬 추가 */
     }
 
     .feedback {
