@@ -333,6 +333,8 @@ header p {
         font-size: 1rem;
     }
 
+    /* .feedback-overlay 관련 재정의 제거 */
+
     .feedback {
         margin-top: 15px;
         font-size: 1.2rem;
