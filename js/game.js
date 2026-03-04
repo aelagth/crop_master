@@ -7,8 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalQuestionsEl = document.getElementById('total-questions');
     const timerEl = document.getElementById('timer');
     const timeLeftEl = document.getElementById('time-left');
-    const imageContainer = document.querySelector('.image-container');
+    const imageContainer = document.querySelector('.image-stage');
     const quizImageEl = document.getElementById('quiz-image');
+    const blurImageEl = document.getElementById('quiz-image-blur');
+    const focusNudgeEl = document.getElementById('focus-nudge');
     const optionsContainer = document.getElementById('options-container');
     const feedbackEl = document.getElementById('feedback');
     const nextBtn = document.getElementById('next-btn');
@@ -24,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let zoomLevel = 1.95; // 1.5 * 1.3 = 1.95
     let timerInterval;
     let timeLeft = 15;
+    let blurHideTimeout;
+    let beginnerViewTimeout;
+    let nudgeHideTimeout;
 
     function loadGameData() {
         if (typeof gameData !== 'undefined' && gameData.length > 0) {
@@ -72,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentQuestion = questions[currentQuestionIndex];
         questionNumberEl.textContent = currentQuestionIndex + 1;
         quizImageEl.src = currentQuestion.image_path;
+        blurImageEl.src = currentQuestion.image_path;
+        startImageRevealSequence();
 
         const correctAnswer = currentQuestion.texts.text;
         const options = generateOptions(correctAnswer);
@@ -83,6 +90,35 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', () => selectAnswer(button, correctAnswer));
             optionsContainer.insertBefore(button, feedbackOverlay);
         });
+    }
+
+
+        }, 12000);
+        clearTimeout(blurHideTimeout);
+        clearTimeout(beginnerViewTimeout);
+        clearTimeout(nudgeHideTimeout);
+
+        blurImageEl.classList.remove('reveal');
+        blurImageEl.classList.remove('hidden');
+
+        focusNudgeEl.classList.remove('hidden');
+        focusNudgeEl.classList.remove('fade-out');
+
+        // DOM reflow를 강제로 발생시켜 애니메이션 재시작
+        void blurImageEl.offsetWidth;
+        blurImageEl.classList.add('reveal');
+
+        beginnerViewTimeout = setTimeout(() => {
+            focusNudgeEl.classList.add('fade-out');
+            nudgeHideTimeout = setTimeout(() => {
+                focusNudgeEl.classList.add('hidden');
+                focusNudgeEl.classList.remove('fade-out');
+            }, 300);
+        }, 3000);
+
+        blurHideTimeout = setTimeout(() => {
+            blurImageEl.classList.add('hidden');
+        }, 7000);
     }
 
     function startTimer() {
@@ -159,10 +195,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetState() {
         clearInterval(timerInterval);
+        clearTimeout(blurHideTimeout);
+        clearTimeout(beginnerViewTimeout);
+        clearTimeout(nudgeHideTimeout);
         feedbackEl.textContent = '';
         feedbackOverlay.classList.add('hidden');
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
+        blurImageEl.classList.remove('reveal');
+        blurImageEl.classList.add('hidden');
+        focusNudgeEl.classList.add('hidden');
+        focusNudgeEl.classList.remove('fade-out');
         
         // 더 효율적인 방식으로 option-btn 제거
         optionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.remove());
@@ -220,6 +263,10 @@ document.addEventListener('DOMContentLoaded', () => {
     imageContainer.addEventListener('touchend', () => {
         quizImageEl.style.transform = 'scale(1)';
         quizImageEl.style.transformOrigin = 'center center';
+        blurImageEl.classList.remove('reveal');
+        blurImageEl.classList.add('hidden');
+        focusNudgeEl.classList.add('hidden');
+        focusNudgeEl.classList.remove('fade-out');
     });
 
     imageContainer.addEventListener('touchmove', (e) => {
