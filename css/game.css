@@ -97,6 +97,30 @@ header p {
     z-index: 20; /* 다른 요소들보다 위에 있도록 */
 }
 
+
+.guide-box {
+    text-align: left;
+    background: #f5f8ff;
+    border: 1px solid #d6defa;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.guide-box h3 {
+    margin: 0 0 8px 0;
+    color: #1a237e;
+    font-size: 1rem;
+}
+
+.guide-box ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #333;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
 .question-count-selector {
     margin-bottom: 30px;
 }
@@ -341,4 +365,9 @@ header p {
     .next-btn {
         padding: 15px; /* PC에서는 원래 크기 유지 */
     }
+}
+.result-message {
+    color: #3949ab;
+    min-height: 1.4em;
+    font-weight: 700;
 }

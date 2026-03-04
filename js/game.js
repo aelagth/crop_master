@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalScoreEl = document.getElementById('final-score');
     const restartBtn = document.getElementById('restart-btn');
     const feedbackOverlay = document.getElementById('feedback-overlay');
+    const accuracyEl = document.getElementById('accuracy');
+    const resultMessageEl = document.getElementById('result-message');
 
     let score = 0;
     let currentQuestionIndex = 0;
@@ -47,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         score = 0;
         currentQuestionIndex = 0;
+        scoreEl.textContent = score;
+        accuracyEl.textContent = '0%';
+        resultMessageEl.textContent = '';
         questions = shuffleArray([...allQuestions]);
 
         if (selectedCount !== 'all') {
@@ -181,6 +186,18 @@ document.addEventListener('DOMContentLoaded', () => {
         quizArea.classList.add('hidden');
         gameOverArea.classList.remove('hidden');
         finalScoreEl.textContent = score;
+
+        const total = questions.length || 1;
+        const accuracy = Math.round((score / total) * 100);
+        accuracyEl.textContent = `${accuracy}%`;
+
+        if (accuracy >= 80) {
+            resultMessageEl.textContent = '훌륭해요! 작물 식별 감각이 아주 좋습니다.';
+        } else if (accuracy >= 50) {
+            resultMessageEl.textContent = '좋아요! 반복 학습하면 더 빠르게 식별할 수 있어요.';
+        } else {
+            resultMessageEl.textContent = '괜찮아요! 사진을 다시 보며 천천히 익혀봅시다.';
+        }
     }
 
     function shuffleArray(array) {
