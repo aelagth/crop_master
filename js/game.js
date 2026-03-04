@@ -92,8 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-        }, 12000);
+    function startImageRevealSequence() {
         clearTimeout(blurHideTimeout);
         clearTimeout(beginnerViewTimeout);
         clearTimeout(nudgeHideTimeout);

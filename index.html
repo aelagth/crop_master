@@ -16,13 +16,8 @@
         <div id="start-area">
             <div class="question-count-selector">
                 <h4>문제 개수 선택</h4>
-                    <div class="image-stage">
-                        <div class="image-square-bg" aria-hidden="true"></div>
-                        <img id="quiz-image" src="" alt="작물 이미지">
-                        <div id="quiz-image-blur" aria-hidden="true"></div>
-                        <div id="focus-nudge" class="focus-nudge hidden">초기 생장 부위를 먼저 관찰해보세요 👀</div>
-                    </div>
-                    <input type="radio" id="count30" name="question-count" value="30">
+                <div class="options-group">
+                    <input type="radio" id="count30" name="question-count" value="30" checked>
                     <label for="count30">30개</label>
                     <input type="radio" id="count60" name="question-count" value="60">
                     <label for="count60">60개</label>
@@ -44,9 +39,12 @@
 
             <div class="card">
                 <div class="image-container">
-                    <img id="quiz-image" src="" alt="작물 이미지">
-                    <img id="quiz-image-blur" src="" alt="" aria-hidden="true">
-                    <div id="focus-nudge" class="focus-nudge hidden">초기 생장 부위를 먼저 관찰해보세요 👀</div>
+                    <div class="image-stage">
+                        <div class="image-square-bg" aria-hidden="true"></div>
+                        <img id="quiz-image" src="" alt="작물 이미지">
+                        <img id="quiz-image-blur" src="" alt="" aria-hidden="true">
+                        <div id="focus-nudge" class="focus-nudge hidden">초기 생장 부위를 먼저 관찰해보세요 👀</div>
+                    </div>
                 </div>
             </div>
 
