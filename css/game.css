@@ -177,7 +177,7 @@ header p {
 
 #quiz-image-blur {
     position: absolute;
-    inset: 0;
+    transition: transform 12s linear, opacity 12s linear;
     width: 50%;
     height: 100%;
     object-fit: contain;
