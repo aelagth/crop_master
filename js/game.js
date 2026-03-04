@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageContainer = document.querySelector('.image-stage');
     const quizImageEl = document.getElementById('quiz-image');
     const blurImageEl = document.getElementById('quiz-image-blur');
-    const focusNudgeEl = document.getElementById('focus-nudge');
     const optionsContainer = document.getElementById('options-container');
     const feedbackEl = document.getElementById('feedback');
     const nextBtn = document.getElementById('next-btn');
@@ -27,8 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval;
     let timeLeft = 15;
     let blurHideTimeout;
-    let beginnerViewTimeout;
-    let nudgeHideTimeout;
+    let blurBounds = { left: 0, top: 0, width: 0, height: 0 };
 
     function loadGameData() {
         if (typeof gameData !== 'undefined' && gameData.length > 0) {
@@ -78,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         questionNumberEl.textContent = currentQuestionIndex + 1;
         quizImageEl.src = currentQuestion.image_path;
         blurImageEl.src = currentQuestion.image_path;
+        syncBlurToImageBounds();
         startImageRevealSequence();
 
         const correctAnswer = currentQuestion.texts.text;
@@ -92,33 +91,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function syncBlurToImageBounds() {
+        const imageNaturalWidth = quizImageEl.naturalWidth;
+        const imageNaturalHeight = quizImageEl.naturalHeight;
 
-        }, 12000);
+        if (!imageNaturalWidth || !imageNaturalHeight) {
+            blurImageEl.style.removeProperty('--blur-left');
+            blurImageEl.style.removeProperty('--blur-top');
+            blurImageEl.style.removeProperty('--blur-width');
+            blurImageEl.style.removeProperty('--blur-height');
+            blurBounds = { left: 0, top: 0, width: imageContainer.clientWidth, height: imageContainer.clientHeight };
+            return;
+        }
+
+        const stageWidth = imageContainer.clientWidth;
+        const stageHeight = imageContainer.clientHeight;
+        const imageRatio = imageNaturalWidth / imageNaturalHeight;
+        const stageRatio = stageWidth / stageHeight;
+
+        let renderWidth;
+        let renderHeight;
+        let offsetLeft;
+        let offsetTop;
+
+        if (imageRatio > stageRatio) {
+            renderWidth = stageWidth;
+            renderHeight = stageWidth / imageRatio;
+            offsetLeft = 0;
+            offsetTop = (stageHeight - renderHeight) / 2;
+        } else {
+            renderHeight = stageHeight;
+            renderWidth = stageHeight * imageRatio;
+            offsetTop = 0;
+            offsetLeft = (stageWidth - renderWidth) / 2;
+        }
+
+        blurImageEl.style.setProperty('--blur-left', `${offsetLeft}px`);
+        blurImageEl.style.setProperty('--blur-top', `${offsetTop}px`);
+        blurImageEl.style.setProperty('--blur-width', `${renderWidth}px`);
+        blurImageEl.style.setProperty('--blur-height', `${renderHeight}px`);
+
+        blurBounds = {
+            left: offsetLeft,
+            top: offsetTop,
+            width: renderWidth,
+            height: renderHeight
+        };
+    }
+
+    function startImageRevealSequence() {
         clearTimeout(blurHideTimeout);
-        clearTimeout(beginnerViewTimeout);
-        clearTimeout(nudgeHideTimeout);
 
         blurImageEl.classList.remove('reveal');
         blurImageEl.classList.remove('hidden');
-
-        focusNudgeEl.classList.remove('hidden');
-        focusNudgeEl.classList.remove('fade-out');
 
         // DOM reflow를 강제로 발생시켜 애니메이션 재시작
         void blurImageEl.offsetWidth;
         blurImageEl.classList.add('reveal');
 
-        beginnerViewTimeout = setTimeout(() => {
-            focusNudgeEl.classList.add('fade-out');
-            nudgeHideTimeout = setTimeout(() => {
-                focusNudgeEl.classList.add('hidden');
-                focusNudgeEl.classList.remove('fade-out');
-            }, 300);
-        }, 3000);
-
         blurHideTimeout = setTimeout(() => {
             blurImageEl.classList.add('hidden');
-        }, 7000);
+        }, 12000);
     }
 
     function startTimer() {
@@ -196,16 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetState() {
         clearInterval(timerInterval);
         clearTimeout(blurHideTimeout);
-        clearTimeout(beginnerViewTimeout);
-        clearTimeout(nudgeHideTimeout);
         feedbackEl.textContent = '';
         feedbackOverlay.classList.add('hidden');
-        quizImageEl.style.transform = 'scale(1)';
-        quizImageEl.style.transformOrigin = 'center center';
+        applyImageTransform(1, 'center center');
         blurImageEl.classList.remove('reveal');
         blurImageEl.classList.add('hidden');
-        focusNudgeEl.classList.add('hidden');
-        focusNudgeEl.classList.remove('fade-out');
         
         // 더 효율적인 방식으로 option-btn 제거
         optionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.remove());
@@ -230,43 +258,58 @@ document.addEventListener('DOMContentLoaded', () => {
         return array.sort(() => Math.random() - 0.5);
     }
 
+    function applyImageTransform(scale, originOrPoint) {
+        quizImageEl.style.transform = `scale(${scale})`;
+        blurImageEl.style.transform = `scale(${scale})`;
+
+        if (!originOrPoint) {
+            return;
+        }
+
+        if (typeof originOrPoint === 'string') {
+            quizImageEl.style.transformOrigin = originOrPoint;
+            blurImageEl.style.transformOrigin = originOrPoint;
+            return;
+        }
+
+        const pointX = originOrPoint.x;
+        const pointY = originOrPoint.y;
+        quizImageEl.style.transformOrigin = `${pointX}px ${pointY}px`;
+
+        const blurOriginX = pointX - blurBounds.left;
+        const blurOriginY = pointY - blurBounds.top;
+        blurImageEl.style.transformOrigin = `${blurOriginX}px ${blurOriginY}px`;
+    }
+
     imageContainer.addEventListener('mouseenter', () => {
-        quizImageEl.style.transform = `scale(${zoomLevel})`;
+        applyImageTransform(zoomLevel);
     });
 
     imageContainer.addEventListener('mouseleave', () => {
-        quizImageEl.style.transform = 'scale(1)';
-        quizImageEl.style.transformOrigin = 'center center';
+        applyImageTransform(1, 'center center');
     });
 
     imageContainer.addEventListener('mousemove', (e) => {
         const rect = imageContainer.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        const xPercent = (x / rect.width) * 100;
-        const yPercent = (y / rect.height) * 100;
-        quizImageEl.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+        applyImageTransform(zoomLevel, { x, y });
     });
 
     imageContainer.addEventListener('wheel', (e) => {
         e.preventDefault();
         zoomLevel += e.deltaY * -0.01;
         zoomLevel = Math.min(Math.max(1.2, zoomLevel), 5.0);
-        quizImageEl.style.transform = `scale(${zoomLevel})`;
+        applyImageTransform(zoomLevel);
     });
     imageContainer.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
-            quizImageEl.style.transform = `scale(${zoomLevel})`;
+            applyImageTransform(zoomLevel);
         }
     });
 
     imageContainer.addEventListener('touchend', () => {
-        quizImageEl.style.transform = 'scale(1)';
-        quizImageEl.style.transformOrigin = 'center center';
-        blurImageEl.classList.remove('reveal');
-        blurImageEl.classList.add('hidden');
-        focusNudgeEl.classList.add('hidden');
-        focusNudgeEl.classList.remove('fade-out');
+        applyImageTransform(1, 'center center');
     });
 
     imageContainer.addEventListener('touchmove', (e) => {
@@ -274,11 +317,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const rect = imageContainer.getBoundingClientRect();
             const x = e.touches[0].clientX - rect.left;
             const y = e.touches[0].clientY - rect.top;
-            const xPercent = (x / rect.width) * 100;
-            const yPercent = (y / rect.height) * 100;
-            quizImageEl.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            applyImageTransform(zoomLevel, { x, y });
         }
     });
+
+    quizImageEl.addEventListener('load', syncBlurToImageBounds);
+    window.addEventListener('resize', syncBlurToImageBounds);
 
     startBtn.addEventListener('click', startGame);
     nextBtn.addEventListener('click', showNextQuestion);

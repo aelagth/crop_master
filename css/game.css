@@ -191,44 +191,20 @@ header p {
 
 #quiz-image-blur {
     position: absolute;
-    transition: transform 12s linear, opacity 12s linear;
-    width: 50%;
-    height: 100%;
-    object-fit: contain;
-    object-position: left center;
+    left: var(--blur-left, 0px);
+    top: var(--blur-top, 0px);
+    width: var(--blur-width, 100%);
+    height: var(--blur-height, 100%);
+    object-fit: fill;
     filter: blur(18px);
-    opacity: 0.95;
-    transition: opacity 7s linear, filter 7s linear;
+    clip-path: inset(50% 0 0 0);
     pointer-events: none;
     z-index: 2;
+    transition: clip-path 12s linear, transform 0.3s ease;
 }
 
 #quiz-image-blur.reveal {
-    filter: blur(0);
-    opacity: 0;
-}
-
-.focus-nudge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    max-width: 48%;
-    padding: 8px 10px;
-    border-radius: 8px;
-    background-color: rgba(26, 35, 126, 0.8);
-    color: #fff;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-align: left;
-    line-height: 1.3;
-    z-index: 3;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-.focus-nudge.fade-out {
-    opacity: 0;
+    clip-path: inset(100% 0 0 0);
 }
 
 .options {
