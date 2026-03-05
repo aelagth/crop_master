@@ -197,14 +197,14 @@ header p {
     height: var(--blur-height, 100%);
     object-fit: fill;
     filter: blur(18px);
-    clip-path: inset(50% 0 0 0);
+    clip-path: inset(0 0 30% 0);
     pointer-events: none;
     z-index: 2;
     transition: clip-path 12s linear, transform 0.3s ease;
 }
 
 #quiz-image-blur.reveal {
-    clip-path: inset(100% 0 0 0);
+    clip-path: inset(0 0 100% 0);
 }
 
 .options {

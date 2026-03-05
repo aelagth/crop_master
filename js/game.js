@@ -203,6 +203,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return shuffleArray(options);
     }
 
+
+    function calculateScoreByTime(remainingTime) {
+        if (remainingTime >= 11) {
+            return 3;
+        }
+
+        if (remainingTime <= 6) {
+            return 2;
+        }
+
+        return 1;
+    }
+
     function selectAnswer(selectedBtn, correctAnswer) {
         clearInterval(timerInterval);
         const selectedAnswer = selectedBtn.innerText;
@@ -214,9 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (selectedAnswer === correctAnswer) {
-            score++;
+            const earnedScore = calculateScoreByTime(timeLeft);
+            score += earnedScore;
             scoreEl.textContent = score;
-            feedbackEl.textContent = '정답입니다!';
+            feedbackEl.textContent = `정답입니다! (+${earnedScore}점)`;
             feedbackEl.style.color = '#4CAF50';
         } else {
             feedbackEl.textContent = `오답! 정답은 ${correctAnswer} 입니다.`;
