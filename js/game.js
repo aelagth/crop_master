@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let zoomLevel = 1.95; // 1.5 * 1.3 = 1.95
     let timerInterval;
     let timeLeft = 15;
+    let questionStartedAt = 0;
+    const QUESTION_TIME_LIMIT = 15;
     let blurHideTimeout;
     let blurBounds = { left: 0, top: 0, width: 0, height: 0 };
 
@@ -155,11 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startTimer() {
-        timeLeft = 15;
+        questionStartedAt = Date.now();
+        timeLeft = QUESTION_TIME_LIMIT;
         timeLeftEl.textContent = timeLeft;
         timerEl.classList.remove('warning');
         timerInterval = setInterval(() => {
-            timeLeft--;
+            timeLeft = getRemainingTimeSeconds();
             timeLeftEl.textContent = timeLeft;
             if (timeLeft <= 5) {
                 timerEl.classList.add('warning');
@@ -169,6 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeUp();
             }
         }, 1000);
+    }
+
+    function getRemainingTimeSeconds() {
+        const elapsedSeconds = Math.floor((Date.now() - questionStartedAt) / 1000);
+        return Math.max(QUESTION_TIME_LIMIT - elapsedSeconds, 0);
     }
 
     function timeUp() {
@@ -209,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return 3;
         }
 
-        if (remainingTime <= 6) {
+        if (remainingTime >= 6) {
             return 2;
         }
 
@@ -219,6 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function selectAnswer(selectedBtn, correctAnswer) {
         clearInterval(timerInterval);
         const selectedAnswer = selectedBtn.innerText;
+        const remainingTime = getRemainingTimeSeconds();
+        timeLeft = remainingTime;
+        timeLeftEl.textContent = remainingTime;
         
         Array.from(optionsContainer.children).forEach(button => {
             if (button.classList.contains('option-btn')) {
@@ -227,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (selectedAnswer === correctAnswer) {
-            const earnedScore = calculateScoreByTime(timeLeft);
+            const earnedScore = calculateScoreByTime(remainingTime);
             score += earnedScore;
             scoreEl.textContent = score;
             feedbackEl.textContent = `정답입니다! (+${earnedScore}점)`;
