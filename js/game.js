@@ -21,33 +21,42 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;
     let currentQuestionIndex = 0;
     let allQuestions = [];
+    let answerNames = [];
     let questions = [];
     let zoomLevel = 1.95; // 1.5 * 1.3 = 1.95
     let timerInterval;
     let timeLeft = 15;
     let questionStartedAt = 0;
     const QUESTION_TIME_LIMIT = 15;
+    const OPTION_COUNT = 4;
     let blurHideTimeout;
     let blurBounds = { left: 0, top: 0, width: 0, height: 0 };
 
     function loadGameData() {
-        if (typeof gameData !== 'undefined' && gameData.length > 0) {
-            allQuestions = gameData.filter(item => item.texts && item.texts.text && item.texts.text.trim() !== '');
-            if (allQuestions.length < 4) {
-                startBtn.textContent = '데이터 부족 (4개 이상 필요)';
-                startBtn.disabled = true;
-            } else {
-                startBtn.disabled = false;
-                startBtn.textContent = '게임 시작';
-            }
-        } else {
+        if (typeof gameData === 'undefined' || !Array.isArray(gameData) || gameData.length === 0) {
+            allQuestions = [];
+            answerNames = [];
             alert('게임 데이터를 찾을 수 없습니다. 데이터 생성기에서 데이터셋을 생성하고, 오프라인 버전을 다시 만들어주세요.');
             startBtn.disabled = true;
             startBtn.textContent = '데이터 없음';
+            return;
         }
+
+        allQuestions = gameData.flatMap(question => {
+            const text = question?.texts?.text;
+            const name = typeof text === 'string' ? text.trim().replace(/\s+/g, ' ') : '';
+            return name ? [{ ...question, texts: { ...question.texts, text: name } }] : [];
+        });
+        answerNames = [...new Set(allQuestions.map(question => question.texts.text))];
+        startBtn.disabled = answerNames.length < OPTION_COUNT;
+        startBtn.textContent = startBtn.disabled ? `서로 다른 정답 ${OPTION_COUNT}종 필요` : '게임 시작';
     }
 
     function startGame() {
+        if (answerNames.length < OPTION_COUNT) {
+            return;
+        }
+
         const selectedCount = document.querySelector('input[name="question-count"]:checked').value;
         
         score = 0;
@@ -192,23 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateOptions(correctAnswer) {
-        const options = [correctAnswer];
-        const allAnswers = allQuestions.map(q => q.texts.text);
-        const wrongAnswers = [...new Set(allAnswers.filter(answer => answer !== correctAnswer))];
-        const shuffledWrongAnswers = shuffleArray(wrongAnswers);
-
-        for (let i = 0; i < 3; i++) {
-            if (shuffledWrongAnswers[i] && options.length < 4) {
-                options.push(shuffledWrongAnswers[i]);
-            }
-        }
-        while(options.length < 4 && options.length < allAnswers.length) {
-            const randomAnswer = allAnswers[Math.floor(Math.random() * allAnswers.length)];
-            if(!options.includes(randomAnswer)) {
-                options.push(randomAnswer);
-            }
-        }
-        return shuffleArray(options);
+        const wrongAnswers = answerNames.filter(answer => answer !== correctAnswer);
+        const distractors = shuffleArray(wrongAnswers).slice(0, OPTION_COUNT - 1);
+        return shuffleArray([correctAnswer, ...distractors]);
     }
 
 
