@@ -7,21 +7,17 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100svh;
     margin: 0;
     color: #333;
-    padding: 10px 0; /* 상하 여백 추가 */
+    padding: max(10px, env(safe-area-inset-top)) env(safe-area-inset-right)
+             max(10px, env(safe-area-inset-bottom)) env(safe-area-inset-left);
     box-sizing: border-box;
     touch-action: manipulation; /* 더블 탭 확대 방지 */
 }
 
-html, body {
-    height: 100%;
-    overflow: hidden;
-}
-
 .game-container {
     width: 100%;
-    height: 100%; /* 전체 높이 사용 */
     max-width: 500px;
     background-color: #ffffff;
     border-radius: 20px;
@@ -30,14 +26,11 @@ html, body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 활성화된 영역이 중앙에 오도록 */
 }
 
 main#quiz-area {
-    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 위아래로 고르게 분포 */
 }
 
 .score-board {
@@ -61,8 +54,6 @@ main#quiz-area {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    flex: 1; /* 남은 공간을 최대한 차지하고 필요하면 줄어들도록 */
-    max-height: 40vh; /* 이미지 영역 최대 높이 제한 */
 }
 
 .image-container {
@@ -75,7 +66,8 @@ main#quiz-area {
 
 .image-stage {
     position: relative;
-    width: min(100%, 40vh);
+    width: min(100%, clamp(140px, 38vh, 320px));
+    width: min(100%, clamp(140px, 38svh, 320px));
     aspect-ratio: 1 / 1;
     overflow: hidden;
 }
@@ -317,24 +309,55 @@ header p {
     pointer-events: none; /* 숨겨진 요소가 이벤트 가로채지 않도록 */
 }
 
-/* PC 환경 스타일 */
-@media (min-width: 600px) {
+@media (max-width: 599px), (max-height: 699px) {
     .game-container {
+        padding: 14px;
+    }
+
+    header h1 {
+        margin: 0 0 4px;
+        font-size: 1.4rem;
+    }
+
+    header p {
+        margin: 0 0 12px;
+        font-size: 0.9rem;
+    }
+
+    .score-board,
+    .card {
+        margin-bottom: 10px;
+    }
+
+    .options {
+        gap: 8px;
+        margin-bottom: 0;
+    }
+
+    .option-btn {
+        min-width: 0;
+        min-height: 44px;
+        padding: 8px;
+        overflow-wrap: anywhere;
+    }
+
+    .feedback {
         height: auto;
-        justify-content: flex-start;
+        margin-bottom: 4px;
     }
 
-    main#quiz-area {
-        flex-grow: 0;
+    .next-btn {
+        margin-top: 0;
     }
+}
 
+/* PC 환경 스타일 */
+@media (min-width: 600px) and (min-height: 700px) {
     #start-area {
         flex-grow: 0;
     }
 
     .card {
-        flex: 0 0 auto; /* PC에서는 고정된 크기 유지 */
-        max-height: none; /* PC에서는 최대 높이 제한 해제 */
         margin-bottom: 25px;
     }
 
