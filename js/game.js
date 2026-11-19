@@ -326,7 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function shuffleArray(array) {
-        return array.sort(() => Math.random() - 0.5);
+        for (let index = array.length - 1; index > 0; index--) {
+            const swapIndex = Math.floor(Math.random() * (index + 1));
+            [array[index], array[swapIndex]] = [array[swapIndex], array[index]];
+        }
+        return array;
     }
 
     function applyImageTransform(scale, originOrPoint) {

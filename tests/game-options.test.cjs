@@ -6,6 +6,7 @@ const vm = require('node:vm');
 
 const gameScript = readFileSync(join(__dirname, '../js/game.js'), 'utf8');
 const cropNames = ['논벼', '밭벼', '콩', '옥수수', '토란'];
+const randomWithoutSwaps = () => 1 - Number.EPSILON;
 
 function makeElement() {
     const classes = new Set();
@@ -47,7 +48,7 @@ function makeElement() {
     };
 }
 
-function launchGame(names, { random = () => 0.5, count = 'all', manualImages = false } = {}) {
+function launchGame(names, { random = randomWithoutSwaps, count = 'all', manualImages = false } = {}) {
     const elements = new Map();
     const timers = new Map();
     const timeouts = new Map();
@@ -213,6 +214,38 @@ test('the selected question limit does not limit the pool of distractors', () =>
 
     assert.equal(app.get('total-questions').textContent, 10);
     assert.deepEqual(new Set(app.options().map(button => button.innerText)), new Set(cropNames.slice(0, 4)));
+});
+
+test('ten-question games sample the full pool again and display the sampled order', async () => {
+    const names = Array.from({ length: 20 }, (_, index) => `작물 ${index}`);
+    let firstDraw;
+    const app = launchGame(names, {
+        count: '10',
+        random: () => {
+            const draw = firstDraw ?? randomWithoutSwaps();
+            firstDraw = undefined;
+            return draw;
+        },
+    });
+
+    async function playTen(draw) {
+        firstDraw = draw;
+        await app.clickAndSettle('start-btn');
+        assert.equal(app.get('total-questions').textContent, 10);
+
+        const shown = [];
+        for (let index = 0; index < 10; index++) {
+            shown.push(parseInt(app.get('quiz-image').src, 10));
+            app.advance(15);
+            await app.clickAndSettle('next-btn');
+        }
+
+        app.click('restart-btn');
+        return shown;
+    }
+
+    assert.deepEqual(await playTen(0), [19, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    assert.deepEqual(await playTen(0.25), [0, 1, 2, 3, 4, 19, 6, 7, 8, 9]);
 });
 
 test('correct answers retain the 3/2/1-point time thresholds', async () => {
