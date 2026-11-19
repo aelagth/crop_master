@@ -25,10 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let questions = [];
     let zoomLevel = 1.95; // 1.5 * 1.3 = 1.95
     let timerInterval;
-    let timeLeft = 15;
-    let questionStartedAt = 0;
+    let activeRound;
     const QUESTION_TIME_LIMIT = 15;
+    const IMAGE_LOAD_TIMEOUT_MS = 15000;
     const OPTION_COUNT = 4;
+    let imageLoadTimeout;
     let blurHideTimeout;
     let blurBounds = { left: 0, top: 0, width: 0, height: 0 };
 
@@ -53,13 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startGame() {
-        if (answerNames.length < OPTION_COUNT) {
+        if (answerNames.length < OPTION_COUNT || startArea.classList.contains('hidden')) {
             return;
         }
 
         const selectedCount = document.querySelector('input[name="question-count"]:checked').value;
         
         score = 0;
+        scoreEl.textContent = score;
+        finalScoreEl.textContent = score;
         currentQuestionIndex = 0;
         questions = shuffleArray([...allQuestions]);
 
@@ -82,24 +85,54 @@ document.addEventListener('DOMContentLoaded', () => {
         quizArea.classList.remove('hidden');
 
         resetState();
-        startTimer();
-        const currentQuestion = questions[currentQuestionIndex];
+        const { image_path: imagePath, texts: { text: correctAnswer } } = questions[currentQuestionIndex];
+        const round = { correctAnswer, phase: 'loading' };
+        activeRound = round;
         questionNumberEl.textContent = currentQuestionIndex + 1;
-        quizImageEl.src = currentQuestion.image_path;
-        blurImageEl.src = currentQuestion.image_path;
-        syncBlurToImageBounds();
-        startImageRevealSequence();
+        timeLeftEl.textContent = '–';
+        timerEl.classList.remove('warning');
+        quizImageEl.classList.add('hidden');
+        nextBtn.classList.add('hidden');
+        showFeedback('이미지 불러오는 중…', '#333');
 
-        const correctAnswer = currentQuestion.texts.text;
         const options = generateOptions(correctAnswer);
-
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.innerText = optionText;
             button.classList.add('option-btn');
-            button.addEventListener('click', () => selectAnswer(button, correctAnswer));
+            button.addEventListener('click', () => selectAnswer(round, optionText));
             optionsContainer.insertBefore(button, feedbackOverlay);
         });
+        setOptionsDisabled(true);
+
+        if (typeof imagePath !== 'string' || !imagePath.trim()) {
+            imageLoadFailed(round);
+            return;
+        }
+
+        quizImageEl.src = imagePath;
+        blurImageEl.src = imagePath;
+        imageLoadTimeout = setTimeout(() => imageLoadFailed(round), IMAGE_LOAD_TIMEOUT_MS);
+        Promise.all([quizImageEl.decode(), blurImageEl.decode()]).then(() => {
+            if (activeRound !== round || round.phase !== 'loading') {
+                return;
+            }
+            clearTimeout(imageLoadTimeout);
+            feedbackOverlay.classList.add('hidden');
+            quizImageEl.classList.remove('hidden');
+            syncBlurToImageBounds();
+            startImageRevealSequence();
+            startTimer(round);
+            setOptionsDisabled(false);
+        }, () => imageLoadFailed(round));
+    }
+
+    function imageLoadFailed(round) {
+        if (activeRound !== round || round.phase !== 'loading') {
+            return;
+        }
+        finishQuestion(round);
+        showFeedback('이미지를 불러오지 못했습니다.', '#F44336');
     }
 
     function syncBlurToImageBounds() {
@@ -165,39 +198,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 12000);
     }
 
-    function startTimer() {
-        questionStartedAt = Date.now();
-        timeLeft = QUESTION_TIME_LIMIT;
-        timeLeftEl.textContent = timeLeft;
-        timerEl.classList.remove('warning');
+    function startTimer(round) {
+        round.deadline = performance.now() + QUESTION_TIME_LIMIT * 1000;
+        round.phase = 'active';
+        timeLeftEl.textContent = QUESTION_TIME_LIMIT;
         timerInterval = setInterval(() => {
-            timeLeft = getRemainingTimeSeconds();
-            timeLeftEl.textContent = timeLeft;
-            if (timeLeft <= 5) {
-                timerEl.classList.add('warning');
+            if (activeRound !== round || round.phase !== 'active') {
+                return;
             }
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                timeUp();
+            const remainingTime = getRemainingTimeSeconds(round);
+            updateTimerDisplay(remainingTime);
+            if (remainingTime === 0) {
+                timeUp(round);
             }
         }, 1000);
     }
 
-    function getRemainingTimeSeconds() {
-        const elapsedSeconds = Math.floor((Date.now() - questionStartedAt) / 1000);
-        return Math.max(QUESTION_TIME_LIMIT - elapsedSeconds, 0);
+    function getRemainingTimeSeconds(round) {
+        return Math.max(0, Math.ceil((round.deadline - performance.now()) / 1000));
     }
 
-    function timeUp() {
-        Array.from(optionsContainer.children).forEach(button => {
-            if (button.classList.contains('option-btn')) {
-                button.classList.add('disabled');
-            }
+    function updateTimerDisplay(remainingTime) {
+        timeLeftEl.textContent = remainingTime;
+        timerEl.classList.toggle('warning', remainingTime <= 5);
+    }
+
+    function setOptionsDisabled(disabled) {
+        optionsContainer.querySelectorAll('.option-btn').forEach(button => {
+            button.disabled = disabled;
+            button.classList.toggle('disabled', disabled);
         });
-        const correctAnswer = questions[currentQuestionIndex].texts.text;
-        feedbackEl.textContent = `시간 초과! 정답은 ${correctAnswer} 입니다.`;
-        feedbackEl.style.color = '#F44336';
+    }
+
+    function finishQuestion(round) {
+        round.phase = 'finished';
+        clearInterval(timerInterval);
+        clearTimeout(imageLoadTimeout);
+        setOptionsDisabled(true);
+        nextBtn.classList.remove('hidden');
+    }
+
+    function showFeedback(message, color) {
+        feedbackEl.textContent = message;
+        feedbackEl.style.color = color;
         feedbackOverlay.classList.remove('hidden');
+    }
+
+    function timeUp(round) {
+        finishQuestion(round);
+        showFeedback(`시간 초과! 정답은 ${round.correctAnswer} 입니다.`, '#F44336');
     }
 
     function generateOptions(correctAnswer) {
@@ -219,36 +268,34 @@ document.addEventListener('DOMContentLoaded', () => {
         return 1;
     }
 
-    function selectAnswer(selectedBtn, correctAnswer) {
-        clearInterval(timerInterval);
-        const selectedAnswer = selectedBtn.innerText;
-        const remainingTime = getRemainingTimeSeconds();
-        timeLeft = remainingTime;
-        timeLeftEl.textContent = remainingTime;
-        
-        Array.from(optionsContainer.children).forEach(button => {
-            if (button.classList.contains('option-btn')) {
-                button.classList.add('disabled');
-            }
-        });
+    function selectAnswer(round, selectedAnswer) {
+        if (activeRound !== round || round.phase !== 'active') {
+            return;
+        }
 
-        if (selectedAnswer === correctAnswer) {
+        const remainingTime = getRemainingTimeSeconds(round);
+        updateTimerDisplay(remainingTime);
+        if (remainingTime === 0) {
+            timeUp(round);
+            return;
+        }
+
+        finishQuestion(round);
+        if (selectedAnswer === round.correctAnswer) {
             const earnedScore = calculateScoreByTime(remainingTime);
             score += earnedScore;
             scoreEl.textContent = score;
-            feedbackEl.textContent = `정답입니다! (+${earnedScore}점)`;
-            feedbackEl.style.color = '#4CAF50';
+            showFeedback(`정답입니다! (+${earnedScore}점)`, '#4CAF50');
         } else {
-            feedbackEl.textContent = `오답! 정답은 ${correctAnswer} 입니다.`;
-            feedbackEl.style.color = '#F44336';
+            showFeedback(`오답! 정답은 ${round.correctAnswer} 입니다.`, '#F44336');
         }
-
-        feedbackOverlay.classList.remove('hidden');
     }
 
     function resetState() {
+        activeRound = undefined;
         clearInterval(timerInterval);
         clearTimeout(blurHideTimeout);
+        clearTimeout(imageLoadTimeout);
         feedbackEl.textContent = '';
         feedbackOverlay.classList.add('hidden');
         applyImageTransform(1, 'center center');
@@ -260,6 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showNextQuestion() {
+        if (activeRound?.phase !== 'finished') {
+            return;
+        }
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.length) {
             showQuestion();
@@ -269,6 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showGameOver() {
+        resetState();
         quizArea.classList.add('hidden');
         gameOverArea.classList.remove('hidden');
         finalScoreEl.textContent = score;
@@ -341,7 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    quizImageEl.addEventListener('load', syncBlurToImageBounds);
     window.addEventListener('resize', syncBlurToImageBounds);
 
     startBtn.addEventListener('click', startGame);
